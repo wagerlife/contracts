@@ -5,13 +5,9 @@ contract BigGame {
     address[] public teamBirds;
     address[] public teamPats;
     mapping (address => uint) playerIndex;
-    uint public finalPatsPayout;
-    uint public finalBirdsPayout;
 
     function BigGame() public {
         manager = msg.sender;
-        finalPatsPayout = 0;
-        finalBirdsPayout = 0;
     }
 
     modifier restricted() {
@@ -66,7 +62,6 @@ contract BigGame {
     function pickWinner(string winningTeam) public restricted {
         if (compareStrings("birds", winningTeam)) {
             uint birdsPayout = getBirdsPayout();
-            finalBirdsPayout = birdsPayout;
             for (uint i = 0; i < teamBirds.length; i ++) {
                 teamBirds[i].transfer(birdsPayout);
                 playerIndex[teamBirds[i]] = 3;
@@ -76,7 +71,6 @@ contract BigGame {
             }
         } else if (compareStrings("pats", winningTeam)) {
             uint patsPayout = getPatsPayout();
-            finalPatsPayout = patsPayout;
             for (uint k = 0; k < teamPats.length; k ++) {
                 teamPats[k].transfer(patsPayout);
                 playerIndex[teamPats[k]] = 5;
@@ -87,7 +81,7 @@ contract BigGame {
         }
     }
 
-    function refundEverybody() public payable returns (bool) {
+    function refundEverybody() public restricted payable returns (bool) {
       for (uint i = 0; i < teamBirds.length; i ++) {
         teamBirds[i].transfer(.015 ether);
       }
